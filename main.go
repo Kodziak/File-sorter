@@ -16,21 +16,17 @@ func init() {
 }
 
 func main() {
+	dirname := "../../../../../Users/kodziak/Downloads"
+
 	images := []string{"jpg", "jpeg", "png", "bmp"}
-	documents := []string{"pdf", "doc", "docx"}
+	documents := []string{"pdf", "doc", "docx", "txt", "ppt", "rtf"}
 	movies := []string{"avi", "mov"}
+	archive := []string{"rar", "zip", "7z"}
 
 	log.Info("Create new cron")
 	c := cron.New()
 	c.AddFunc("@every 1m", func() {
 		log.Info("[Job 1]Every minute job\n")
-
-		// error := os.Rename("hello.txt", "testdir/hello.txt")
-		// if error != nil {
-		// 	fmt.Println("Error rename", error)
-		// }
-
-		dirname := "../../../../../Users/kodziak/Downloads"
 
 		f, err := os.Open(dirname)
 		if err != nil {
@@ -45,18 +41,20 @@ func main() {
 		for _, file := range files {
 			name := file.Name()
 			extensionArray := strings.Split(name, ".")
-			extension := extensionArray[len(extensionArray)-1]
+			extension := strings.ToLower(extensionArray[len(extensionArray)-1])
 
 			if contains(images, extension) {
-				fmt.Println("This is image file: " + name)
-				moveFile(name, "../../../../../Users/kodziak/Downloads/Images/")
+				printMoveFile(name)
+				moveFile(dirname, name, "/Images/")
 			} else if contains(documents, extension) {
-				fmt.Println("This is document file: " + name)
-				moveFile(name, "../../../../../Users/kodziak/Downloads/Documents/")
-
+				printMoveFile(name)
+				moveFile(dirname, name, "/Documents/")
 			} else if contains(movies, extension) {
-				fmt.Println("This is movie file: " + name)
-				moveFile(name, "../../../../../Users/kodziak/Downloads/Movies/")
+				printMoveFile(name)
+				moveFile(dirname, name, "/Movies/")
+			} else if contains(archive, extension) {
+				printMoveFile(name)
+				moveFile(dirname, name, "/Archives/")
 			}
 		}
 	})
@@ -72,6 +70,10 @@ func printCronEntries(cronEntries []cron.Entry) {
 	log.Infof("Cron Info: %+v\n", cronEntries)
 }
 
+func printMoveFile(file string) {
+	log.Infof("Moving file: " + file)
+}
+
 func contains(slice []string, item string) bool {
 	set := make(map[string]struct{}, len(slice))
 	for _, s := range slice {
@@ -82,8 +84,12 @@ func contains(slice []string, item string) bool {
 	return ok
 }
 
-func moveFile(fileName string, directory string) {
-	error := os.Rename(fileName, directory+fileName)
+func moveFile(baseDirectory string, fileName string, targetDirectory string) {
+	if _, err := os.Stat(baseDirectory + targetDirectory); os.IsNotExist(err) {
+		os.Mkdir(baseDirectory+targetDirectory, 0777)
+	}
+
+	error := os.Rename(baseDirectory+"/"+fileName, baseDirectory+targetDirectory+fileName)
 	if error != nil {
 		fmt.Println("Error rename", error)
 	}
