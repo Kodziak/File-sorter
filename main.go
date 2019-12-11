@@ -16,6 +16,10 @@ func init() {
 }
 
 func main() {
+	images := []string{"jpg", "jpeg", "png", "bmp"}
+	documents := []string{"pdf", "doc", "docx"}
+	movies := []string{"avi", "mov"}
+
 	log.Info("Create new cron")
 	c := cron.New()
 	c.AddFunc("@every 1m", func() {
@@ -40,22 +44,20 @@ func main() {
 
 		for _, file := range files {
 			name := file.Name()
-			extension := strings.Split(name, ".")
-			exst := extension[len(extension)-1]
-			fmt.Println(extension[len(extension)-1])
+			extensionArray := strings.Split(name, ".")
+			extension := extensionArray[len(extensionArray)-1]
 
-			images := []string{"jpg", "jpeg", "png", "bmp"}
-			documents := []string{"pdf", "doc", "docx"}
-			movies := []string{"avi", "mov"}
-
-			if contains(images, exst) {
+			if contains(images, extension) {
 				fmt.Println("This is image file: " + name)
-			} else if contains(documents, exst) {
+				moveFile(name, "../../../../../Users/kodziak/Downloads/Images/")
+			} else if contains(documents, extension) {
 				fmt.Println("This is document file: " + name)
-			} else if contains(movies, exst) {
-				fmt.Println("This is movie file: " + name)
-			}
+				moveFile(name, "../../../../../Users/kodziak/Downloads/Documents/")
 
+			} else if contains(movies, extension) {
+				fmt.Println("This is movie file: " + name)
+				moveFile(name, "../../../../../Users/kodziak/Downloads/Movies/")
+			}
 		}
 	})
 
@@ -78,4 +80,11 @@ func contains(slice []string, item string) bool {
 
 	_, ok := set[item]
 	return ok
+}
+
+func moveFile(fileName string, directory string) {
+	error := os.Rename(fileName, directory+fileName)
+	if error != nil {
+		fmt.Println("Error rename", error)
+	}
 }
