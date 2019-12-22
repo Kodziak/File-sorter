@@ -19,7 +19,7 @@ func main() {
 	dirname := "./Downloads"
 
 	images := []string{"jpg", "jpeg", "png", "bmp"}
-	documents := []string{"pdf", "doc", "docx", "txt", "ppt", "rtf"}
+	documents := []string{"pdf", "doc", "docx", "txt", "ppt", "rtf", "xlsx", "xls"}
 	movies := []string{"avi", "mov"}
 	archive := []string{"rar", "zip", "7z"}
 
@@ -43,9 +43,7 @@ func main() {
 			extensionArray := strings.Split(name, ".")
 			extension := strings.ToLower(extensionArray[len(extensionArray)-1])
 
-			if name == "file-watcher" {
-				return
-			} else if contains(images, extension) {
+			if contains(images, extension) {
 				printMoveFile(name)
 				moveFile(dirname, name, "Images")
 			} else if contains(documents, extension) {
