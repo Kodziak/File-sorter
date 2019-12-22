@@ -16,7 +16,7 @@ func init() {
 }
 
 func main() {
-	dirname := "../../../../../Users/kodziak/Downloads"
+	dirname := "./Downloads"
 
 	images := []string{"jpg", "jpeg", "png", "bmp"}
 	documents := []string{"pdf", "doc", "docx", "txt", "ppt", "rtf"}
@@ -43,18 +43,20 @@ func main() {
 			extensionArray := strings.Split(name, ".")
 			extension := strings.ToLower(extensionArray[len(extensionArray)-1])
 
-			if contains(images, extension) {
+			if name == "file-watcher" {
+				return
+			} else if contains(images, extension) {
 				printMoveFile(name)
-				moveFile(dirname, name, "/Images/")
+				moveFile(dirname, name, "Images")
 			} else if contains(documents, extension) {
 				printMoveFile(name)
-				moveFile(dirname, name, "/Documents/")
+				moveFile(dirname, name, "Documents")
 			} else if contains(movies, extension) {
 				printMoveFile(name)
-				moveFile(dirname, name, "/Movies/")
+				moveFile(dirname, name, "Movies")
 			} else if contains(archive, extension) {
 				printMoveFile(name)
-				moveFile(dirname, name, "/Archives/")
+				moveFile(dirname, name, "Archives")
 			}
 		}
 	})
@@ -63,7 +65,7 @@ func main() {
 	log.Info("Start cron")
 	c.Start()
 	printCronEntries(c.Entries())
-	time.Sleep(20 * time.Minute)
+	time.Sleep(60 * 24 * time.Minute)
 }
 
 func printCronEntries(cronEntries []cron.Entry) {
@@ -86,10 +88,10 @@ func contains(slice []string, item string) bool {
 
 func moveFile(baseDirectory string, fileName string, targetDirectory string) {
 	if _, err := os.Stat(baseDirectory + targetDirectory); os.IsNotExist(err) {
-		os.Mkdir(baseDirectory+targetDirectory, 0777)
+		os.Mkdir(baseDirectory+"/"+targetDirectory+"/", 0777)
 	}
 
-	error := os.Rename(baseDirectory+"/"+fileName, baseDirectory+targetDirectory+fileName)
+	error := os.Rename(baseDirectory+"/"+fileName, baseDirectory+"/"+targetDirectory+"/"+fileName)
 	if error != nil {
 		fmt.Println("Error rename", error)
 	}
